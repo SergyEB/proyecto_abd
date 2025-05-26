@@ -40,4 +40,15 @@ private Connection conexion;
         return fechas;
     }
 
+    public Date obtenerUltimaFechaCargada(String symbol) throws SQLException {
+    String sql = "SELECT MAX(date) AS ultimaFecha FROM CryptoHistoricalPrices WHERE symbol = ?";
+    PreparedStatement ps = conexion.prepareStatement(sql);
+    ps.setString(1, symbol);
+    ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+        return rs.getDate("ultimaFecha");
+    }
+    return null;
+}
+
 }
