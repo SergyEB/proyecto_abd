@@ -2,11 +2,28 @@ package grupo05abd;
 
 import grupo05abd.modelo.User;
 import grupo05abd.modeloDAO.UserDAO;
+import grupo05abd.servicio.CargaCrypto;
 
 import java.util.List;
 
 public class App {
-    public static void main(String[] args) {
+
+public static void main(String[] args) {
+        // Crear instancia del servicio de carga de criptomonedas
+        CargaCrypto cargaCrypto = new CargaCrypto();
+
+        // Probar con Solana (puedes cambiar a otra moneda admitida por CoinGecko)
+        String coinId = "solana";  // CoinGecko ID, por ejemplo: "bitcoin", "ethereum", "solana"
+        
+        System.out.println("Iniciando carga de datos históricos para " + coinId + "...");
+
+        // Llamar al método que carga solo fechas faltantes
+        cargaCrypto.cargarDatos(coinId);
+
+        System.out.println("Carga finalizada.");
+    }
+
+    /*public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
         // 🔍 1️⃣ Leer usuarios
@@ -35,5 +52,5 @@ public class App {
         // ❌ 4️⃣ Eliminar usuario (ajusta el C_user según prueba)
          userDAO.deleteUser(5); // Cambiar al ID real
         System.out.println("🗑️ Usuario eliminado.");
-    }
+    }*/
 }

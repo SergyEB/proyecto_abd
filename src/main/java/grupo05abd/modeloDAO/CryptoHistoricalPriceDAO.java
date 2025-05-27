@@ -20,7 +20,7 @@ private Connection conexion;
     }
 
     public void insertar(CryptoHistoricalPrice price) throws SQLException {
-        String sql = "INSERT INTO CryptoHistoricalPrices (symbol, date, close_price) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO CryptoHistoricalPrice (symbol, date, close_price) VALUES (?, ?, ?)";
         PreparedStatement ps = conexion.prepareStatement(sql);
         ps.setString(1, price.getSymbol());
         ps.setDate(2, new java.sql.Date(price.getDate().getTime()));
@@ -30,7 +30,7 @@ private Connection conexion;
 
     public List<Date> obtenerFechasCargadas(String symbol) throws SQLException {
         List<Date> fechas = new ArrayList<>();
-        String sql = "SELECT date FROM CryptoHistoricalPrices WHERE symbol = ?";
+        String sql = "SELECT date FROM CryptoHistoricalPrice WHERE symbol = ?";
         PreparedStatement ps = conexion.prepareStatement(sql);
         ps.setString(1, symbol);
         ResultSet rs = ps.executeQuery();
@@ -41,7 +41,7 @@ private Connection conexion;
     }
 
     public Date obtenerUltimaFechaCargada(String symbol) throws SQLException {
-    String sql = "SELECT MAX(date) AS ultimaFecha FROM CryptoHistoricalPrices WHERE symbol = ?";
+    String sql = "SELECT MAX(date) AS ultimaFecha FROM CryptoHistoricalPrice WHERE symbol = ?";
     PreparedStatement ps = conexion.prepareStatement(sql);
     ps.setString(1, symbol);
     ResultSet rs = ps.executeQuery();

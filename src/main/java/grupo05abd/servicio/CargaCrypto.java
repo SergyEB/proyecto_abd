@@ -33,11 +33,21 @@ public class CargaCrypto {
                 fromTimestamp = java.time.LocalDate.of(2020, 3, 1).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
             }
 
-            long toTimestamp = java.time.LocalDate.now().atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+            //long toTimestamp = java.time.LocalDate.now().atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+            //Long toTimestamp = java.time.LocalDate.now(java.time.ZoneOffset.UTC).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+            //long toTimestamp = java.time.Instant.now().getEpochSecond();
+            long toTimestamp = java.time.LocalDate.now(java.time.ZoneOffset.UTC).minusDays(1).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+    
+   
+
+    
+
 
             String urlStr = String.format("https://api.coingecko.com/api/v3/coins/%s/market_chart/range?vs_currency=%s&from=%d&to=%d",
                     coinId, VS_CURRENCY, fromTimestamp, toTimestamp);
 
+
+            System.out.println(urlStr);
             URL url = new URL(urlStr);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
