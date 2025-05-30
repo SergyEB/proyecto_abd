@@ -8,90 +8,93 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class CargaCrypto {
 
-    private static final String COIN_ID = "solana";  // Cambia según el símbolo
-    private static final String VS_CURRENCY = "usd";
-
     public void cargarDatos(String coinId) {
+        String jsonResponse = obtenerDatosDesdeAPI(coinId);
+        if (jsonResponse != null) {
+            guardarDatosEnBaseDeDatos(jsonResponse, coinId);
+        }
+    }
+
+    private String obtenerDatosDesdeAPI(String coinId) {
+        String apiKey = "ca0f0c393b8eb0f6fc763f05ac333c9e9475ec1886badeb32b607e0e7ea51518";
+        long start;
+        long end = System.currentTimeMillis();
+
         try {
             CryptoHistoricalPriceDAO dao = new CryptoHistoricalPriceDAO();
+            Date lastDate = dao.getLastLoadedDate(coinId.toUpperCase()); // Convertimos a mayúsculas para coincidir con
+                                                                         // "SOL"
 
-            // Obtener la última fecha cargada
-            Date ultimaFechaCargada = dao.obtenerUltimaFechaCargada(coinId);
-            long fromTimestamp;
-            if (ultimaFechaCargada != null) {
-                fromTimestamp = (ultimaFechaCargada.toLocalDate().plusDays(1).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC));
+            if (lastDate == null) {
+                start = 0L; // Todo el historial
             } else {
-                // Si no hay datos, pedimos desde el inicio (ejemplo: 2020-03-01 para Solana)
-                fromTimestamp = java.time.LocalDate.of(2020, 3, 1).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+                start = lastDate.toLocalDate().plusDays(1).atStartOfDay().toInstant(java.time.ZoneOffset.UTC)
+                        .toEpochMilli();
             }
 
-            //long toTimestamp = java.time.LocalDate.now().atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
-            //Long toTimestamp = java.time.LocalDate.now(java.time.ZoneOffset.UTC).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
-            //long toTimestamp = java.time.Instant.now().getEpochSecond();
-            long toTimestamp = java.time.LocalDate.now(java.time.ZoneOffset.UTC).minusDays(1).atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
-    
-   
+            String apiUrl = String.format(
+                    "https://rest.coincap.io/v3/assets/%s/history?interval=d1&start=%d&end=%d",
+                    coinId, start, end);
 
-    
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+            connection.setRequestProperty("Accept", "application/json");
 
-
-            String urlStr = String.format("https://api.coingecko.com/api/v3/coins/%s/market_chart/range?vs_currency=%s&from=%d&to=%d",
-                    coinId, VS_CURRENCY, fromTimestamp, toTimestamp);
-
-
-            System.out.println(urlStr);
-            URL url = new URL(urlStr);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Accept", "application/json");
-
-            int responseCode = con.getResponseCode();
-            if (responseCode == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder response = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
                 }
-                in.close();
-
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                JSONArray pricesArray = jsonResponse.getJSONArray("prices");
-
-                List<CryptoHistoricalPrice> nuevosPrecios = new ArrayList<>();
-                for (int i = 0; i < pricesArray.length(); i++) {
-                    JSONArray pricePoint = pricesArray.getJSONArray(i);
-                    long timestampMs = pricePoint.getLong(0);
-                    double price = pricePoint.getDouble(1);
-
-                    java.util.Date date = new java.util.Date(timestampMs);
-                    Date sqlDate = new Date(date.getTime());
-
-                    nuevosPrecios.add(new CryptoHistoricalPrice(0, coinId, sqlDate, price));
-                }
-
-                // Insertar nuevos precios
-                for (CryptoHistoricalPrice price : nuevosPrecios) {
-                    dao.insertar(price);
-                }
-
-                System.out.println("Carga de datos completa para " + coinId);
-
+                reader.close();
+                connection.disconnect();
+                return response.toString(); // Retornamos el JSON
             } else {
-                System.out.println("Error en la API de CoinGecko. Código: " + responseCode);
+                System.out.println("Error en la conexión. Código: " + responseCode);
             }
 
+            connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return null; // Si falla, retornamos null
+    }
+
+    private void guardarDatosEnBaseDeDatos(String jsonResponse, String coinId) {
+    try {
+        CryptoHistoricalPriceDAO dao = new CryptoHistoricalPriceDAO();
+        JSONObject json = new JSONObject(jsonResponse);
+        JSONArray data = json.getJSONArray("data");
+
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject record = data.getJSONObject(i);
+            String dateStr = record.getString("date");  // Fecha en formato ISO 8601
+            double closePrice = record.getDouble("priceUsd");
+
+            // Convertir dateStr a java.util.Date
+            java.time.LocalDate localDate = java.time.LocalDate.parse(dateStr.substring(0, 10));  // Solo yyyy-MM-dd
+            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+
+            CryptoHistoricalPrice price = new CryptoHistoricalPrice(coinId.toUpperCase(), sqlDate, closePrice);
+            
+            dao.insert(price);
+        }
+
+        System.out.println("Datos guardados exitosamente en la base de datos.");
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 }
 
+}

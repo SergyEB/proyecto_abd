@@ -10,8 +10,8 @@ public class CryptoHistoricalPrice {
     private double closePrice;  // Precio de cierre
 
     // Constructor
-    public CryptoHistoricalPrice(int id, String symbol, Date date, double closePrice) {
-        this.id = id;
+    public CryptoHistoricalPrice(String symbol, Date date, double closePrice) {
+        
         this.symbol = symbol;
         this.date = date;
         this.closePrice = closePrice;

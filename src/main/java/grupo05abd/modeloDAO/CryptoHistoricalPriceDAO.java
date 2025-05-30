@@ -13,42 +13,43 @@ import grupo05abd.modelo.CryptoHistoricalPrice;
 
 public class CryptoHistoricalPriceDAO {
 
-private Connection conexion;
-
-    public CryptoHistoricalPriceDAO() {
-        conexion = Conexion.getConnection();  // Usando tu clase existente de conexión
-    }
-
-    public void insertar(CryptoHistoricalPrice price) throws SQLException {
-        String sql = "INSERT INTO CryptoHistoricalPrice (symbol, date, close_price) VALUES (?, ?, ?)";
-        PreparedStatement ps = conexion.prepareStatement(sql);
-        ps.setString(1, price.getSymbol());
-        ps.setDate(2, new java.sql.Date(price.getDate().getTime()));
-        ps.setDouble(3, price.getClosePrice());
-        ps.executeUpdate();
-    }
-
-    public List<Date> obtenerFechasCargadas(String symbol) throws SQLException {
-        List<Date> fechas = new ArrayList<>();
-        String sql = "SELECT date FROM CryptoHistoricalPrice WHERE symbol = ?";
-        PreparedStatement ps = conexion.prepareStatement(sql);
-        ps.setString(1, symbol);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            fechas.add(rs.getDate("date"));
+    public void insert(CryptoHistoricalPrice price) throws SQLException {
+        String sql = "INSERT INTO CryptoHistoricalPrice (symbol, date, closePrice) VALUES (?, ?, ?)";
+        try (Connection connection = Conexion.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, price.getSymbol());
+            ps.setDate(2, new java.sql.Date(price.getDate().getTime()));
+            ps.setDouble(3, price.getClosePrice());
+            ps.executeUpdate();
         }
-        return fechas;
     }
 
-    public Date obtenerUltimaFechaCargada(String symbol) throws SQLException {
-    String sql = "SELECT MAX(date) AS ultimaFecha FROM CryptoHistoricalPrice WHERE symbol = ?";
-    PreparedStatement ps = conexion.prepareStatement(sql);
-    ps.setString(1, symbol);
-    ResultSet rs = ps.executeQuery();
-    if (rs.next()) {
-        return rs.getDate("ultimaFecha");
+    public List<Date> getLoadedDates(String symbol) throws SQLException {
+        List<Date> dates = new ArrayList<>();
+        String sql = "SELECT date FROM CryptoHistoricalPrice WHERE symbol = ?";
+        try (Connection connection = Conexion.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, symbol);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    dates.add(rs.getDate("date"));
+                }
+            }
+        }
+        return dates;
     }
-    return null;
-}
 
+    public Date getLastLoadedDate(String symbol) throws SQLException {
+        String sql = "SELECT MAX(date) AS lastDate FROM CryptoHistoricalPrice WHERE symbol = ?";
+        try (Connection connection = Conexion.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, symbol);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDate("lastDate");
+                }
+            }
+        }
+        return null;
+    }
 }
