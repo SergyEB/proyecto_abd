@@ -2,6 +2,7 @@ package grupo05abd;
 
 import grupo05abd.escenarios.Escenario1;
 import grupo05abd.escenarios.Escenario2;
+import grupo05abd.escenarios.Escenario4;
 import grupo05abd.escenarios.Escenario5;
 import grupo05abd.servicio.CargaCrypto;
 
@@ -21,9 +22,15 @@ public class App {
             /*Escenario2 escenario2 = new Escenario2();
             escenario2.ejecutarEscenario2();*/
 
+            //Escenario4
+            Escenario4 escenario4 = new Escenario4();
+            escenario4.ejecutarEscenario4();
+
+
+
             //Escenario5
-            Escenario5 escenario5 = new Escenario5();
-            escenario5.ejecutarEscenario5();
+            /*Escenario5 escenario5 = new Escenario5();
+            escenario5.ejecutarEscenario5();*/
 
 
 

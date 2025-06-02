@@ -4,17 +4,17 @@ import java.sql.Date;
 
 public class Debt {
 
-private int debtId;
+    private int debtId;
     private double totalDebt;
     private double pendingBalance;
     private double interestRate;
     private Date startDate;
     private String debtDescription; // Nullable
     private int debtTypeId;
-    private int userId;
+    private int accountId;          // Reemplaza a userId
 
     public Debt(int debtId, double totalDebt, double pendingBalance, double interestRate,
-                Date startDate, String debtDescription, int debtTypeId, int userId) {
+                Date startDate, String debtDescription, int debtTypeId, int accountId) {
         this.debtId = debtId;
         this.totalDebt = totalDebt;
         this.pendingBalance = pendingBalance;
@@ -22,7 +22,7 @@ private int debtId;
         this.startDate = startDate;
         this.debtDescription = debtDescription;
         this.debtTypeId = debtTypeId;
-        this.userId = userId;
+        this.accountId = accountId;
     }
 
     public int getDebtId() {
@@ -81,11 +81,11 @@ private int debtId;
         this.debtTypeId = debtTypeId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 }

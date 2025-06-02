@@ -4,7 +4,7 @@ import java.sql.Date;
 
 public class Investment {
 
-private int investmentId;
+    private int investmentId;
     private double investedAmount;
     private double interestRate;
     private double currentValue;
@@ -12,11 +12,11 @@ private int investmentId;
     private String investmentDescription; // Nullable
     private Integer investmentTypeId;     // Nullable
     private Integer interestTypeId;       // Nullable
-    private int userId;
+    private int accountId;                // Reemplaza a userId
 
     public Investment(int investmentId, double investedAmount, double interestRate, double currentValue,
                       Date startDate, String investmentDescription, Integer investmentTypeId,
-                      Integer interestTypeId, int userId) {
+                      Integer interestTypeId, int accountId) {
         this.investmentId = investmentId;
         this.investedAmount = investedAmount;
         this.interestRate = interestRate;
@@ -25,7 +25,7 @@ private int investmentId;
         this.investmentDescription = investmentDescription;
         this.investmentTypeId = investmentTypeId;
         this.interestTypeId = interestTypeId;
-        this.userId = userId;
+        this.accountId = accountId;
     }
 
     public int getInvestmentId() {
@@ -92,13 +92,11 @@ private int investmentId;
         this.interestTypeId = interestTypeId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
-
-    
 }

@@ -13,7 +13,8 @@ import grupo05abd.modelo.Debt;
 
 public class DebtDAO {
 
-public void insertDebt(Debt debt) {
+    // INSERT
+    public void insertDebt(Debt debt) {
         String sql = "{CALL dbo.sp_InsertDebt(?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conn = Conexion.getConnection();
              CallableStatement stmt = conn.prepareCall(sql)) {
@@ -27,7 +28,7 @@ public void insertDebt(Debt debt) {
                 stmt.setNull(5, java.sql.Types.VARCHAR);
             }
             stmt.setInt(6, debt.getDebtTypeId());
-            stmt.setInt(7, debt.getUserId());
+            stmt.setInt(7, debt.getAccountId());  // CAMBIO
             stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public void insertDebt(Debt debt) {
                     rs.getDate("F_start"),
                     rs.getString("D_debt"),
                     rs.getInt("C_debt_type"),
-                    rs.getInt("C_user")
+                    rs.getInt("C_account")  // CAMBIO
                 ));
             }
         } catch (SQLException e) {
@@ -75,7 +76,7 @@ public void insertDebt(Debt debt) {
                 stmt.setNull(6, java.sql.Types.VARCHAR);
             }
             stmt.setInt(7, debt.getDebtTypeId());
-            stmt.setInt(8, debt.getUserId());
+            stmt.setInt(8, debt.getAccountId());  // CAMBIO
             stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,5 +94,4 @@ public void insertDebt(Debt debt) {
             e.printStackTrace();
         }
     }
-
 }

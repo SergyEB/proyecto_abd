@@ -1,9 +1,5 @@
 package grupo05abd.modeloDAO;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -13,10 +9,11 @@ import grupo05abd.modelo.Investment;
 
 public class InvestmentDAO {
 
-public void insertInvestment(Investment investment) {
+    // INSERT
+    public void insertInvestment(Investment investment) {
         String sql = "{CALL dbo.sp_InsertInvestment(?, ?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conn = Conexion.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+                CallableStatement stmt = conn.prepareCall(sql)) {
             stmt.setDouble(1, investment.getInvestedAmount());
             stmt.setDouble(2, investment.getInterestRate());
             stmt.setDouble(3, investment.getCurrentValue());
@@ -36,7 +33,7 @@ public void insertInvestment(Investment investment) {
             } else {
                 stmt.setNull(7, java.sql.Types.INTEGER);
             }
-            stmt.setInt(8, investment.getUserId());
+            stmt.setInt(8, investment.getAccountId()); // CAMBIO
             stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,19 +45,19 @@ public void insertInvestment(Investment investment) {
         List<Investment> investments = new ArrayList<>();
         String sql = "SELECT * FROM dbo.fn_GetInvestments()";
         try (Connection conn = Conexion.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 investments.add(new Investment(
-                    rs.getInt("C_investment"),
-                    rs.getDouble("M_invested"),
-                    rs.getDouble("N_interest_rate"),
-                    rs.getDouble("M_current_value"),
-                    rs.getDate("F_start"),
-                    rs.getString("D_investment"),
-                    rs.getObject("C_investment_type") != null ? rs.getInt("C_investment_type") : null,
-                    rs.getObject("C_interest_type") != null ? rs.getInt("C_interest_type") : null,
-                    rs.getInt("C_user")
+                        rs.getInt("C_investment"),
+                        rs.getDouble("M_invested"),
+                        rs.getDouble("N_interest_rate"),
+                        rs.getDouble("M_current_value"),
+                        rs.getDate("F_start"),
+                        rs.getString("D_investment"),
+                        rs.getObject("C_investment_type") != null ? rs.getInt("C_investment_type") : null,
+                        rs.getObject("C_interest_type") != null ? rs.getInt("C_interest_type") : null,
+                        rs.getInt("C_account") // CAMBIO
                 ));
             }
         } catch (SQLException e) {
@@ -73,7 +70,7 @@ public void insertInvestment(Investment investment) {
     public void updateInvestment(Investment investment) {
         String sql = "{CALL dbo.sp_UpdateInvestment(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conn = Conexion.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+                CallableStatement stmt = conn.prepareCall(sql)) {
             stmt.setInt(1, investment.getInvestmentId());
             stmt.setDouble(2, investment.getInvestedAmount());
             stmt.setDouble(3, investment.getInterestRate());
@@ -94,7 +91,7 @@ public void insertInvestment(Investment investment) {
             } else {
                 stmt.setNull(8, java.sql.Types.INTEGER);
             }
-            stmt.setInt(9, investment.getUserId());
+            stmt.setInt(9, investment.getAccountId()); // CAMBIO
             stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,7 +102,7 @@ public void insertInvestment(Investment investment) {
     public void deleteInvestment(int investmentId) {
         String sql = "{CALL dbo.sp_DeleteInvestment(?)}";
         try (Connection conn = Conexion.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+                CallableStatement stmt = conn.prepareCall(sql)) {
             stmt.setInt(1, investmentId);
             stmt.execute();
         } catch (SQLException e) {
@@ -113,4 +110,17 @@ public void insertInvestment(Investment investment) {
         }
     }
 
+    public int getLastInsertedInvestmentId() {
+        String sql = "SELECT MAX(C_investment) AS LastId FROM Investments";
+        try (Connection conn = Conexion.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt("LastId");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Retorna -1 si no hay registros o error
+    }
 }
