@@ -1,9 +1,5 @@
 package grupo05abd.modeloDAO;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -14,26 +10,31 @@ import grupo05abd.modelo.Debt;
 public class DebtDAO {
 
     // INSERT
-    public void insertDebt(Debt debt) {
-        String sql = "{CALL dbo.sp_InsertDebt(?, ?, ?, ?, ?, ?, ?)}";
-        try (Connection conn = Conexion.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            stmt.setDouble(1, debt.getTotalDebt());
-            stmt.setDouble(2, debt.getPendingBalance());
-            stmt.setDouble(3, debt.getInterestRate());
-            stmt.setDate(4, debt.getStartDate());
-            if (debt.getDebtDescription() != null) {
-                stmt.setString(5, debt.getDebtDescription());
-            } else {
-                stmt.setNull(5, java.sql.Types.VARCHAR);
-            }
-            stmt.setInt(6, debt.getDebtTypeId());
-            stmt.setInt(7, debt.getAccountId());  // CAMBIO
-            stmt.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public int insertDebt(Debt debt) {
+    String sql = "{CALL dbo.sp_InsertDebt(?, ?, ?, ?, ?, ?, ?)}";
+    try (Connection conn = Conexion.getConnection();
+         CallableStatement stmt = conn.prepareCall(sql)) {
+        stmt.setDouble(1, debt.getTotalDebt());
+        stmt.setDouble(2, debt.getPendingBalance());
+        stmt.setDouble(3, debt.getInterestRate());
+        stmt.setDate(4, debt.getStartDate());
+        if (debt.getDebtDescription() != null) {
+            stmt.setString(5, debt.getDebtDescription());
+        } else {
+            stmt.setNull(5, java.sql.Types.VARCHAR);
         }
+        stmt.setInt(6, debt.getDebtTypeId());
+        stmt.setInt(7, debt.getAccountId());
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("NewDebtId"); 
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return -1;  // Si falla
+}
 
     // READ
     public List<Debt> getDebts() {
