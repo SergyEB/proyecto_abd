@@ -16,9 +16,10 @@ public class Escenario4 {
         InvestmentDAO investmentDAO = new InvestmentDAO();
         TransactionDAO transactionDAO = new TransactionDAO();
         InvestmentHistoryDAO historyDAO = new InvestmentHistoryDAO();
+        int investmentId = investmentDAO.getLastInsertedInvestmentId();
 
         // Datos de la inversión
-        int investmentId = 0;
+
         double investedAmount = 2000.00;
         double interestRate = 0.14;
         double currentValue = 0.00;

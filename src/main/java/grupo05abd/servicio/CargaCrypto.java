@@ -14,12 +14,7 @@ import org.json.JSONObject;
 
 public class CargaCrypto {
 
-    public void cargarDatos(String coinId) {
-        String jsonResponse = obtenerDatosDesdeAPI(coinId);
-        if (jsonResponse != null) {
-            guardarDatosEnBaseDeDatos(jsonResponse, coinId);
-        }
-    }
+ 
 
     private String obtenerDatosDesdeAPI(String coinId) {
         String apiKey = "ca0f0c393b8eb0f6fc763f05ac333c9e9475ec1886badeb32b607e0e7ea51518";
@@ -96,5 +91,10 @@ public class CargaCrypto {
         e.printStackTrace();
     }
 }
-
+   public void cargarDatos(String coinId) {
+        String jsonResponse = obtenerDatosDesdeAPI(coinId);
+        if (jsonResponse != null) {
+            guardarDatosEnBaseDeDatos(jsonResponse, coinId);
+        }
+    }
 }

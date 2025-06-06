@@ -74,17 +74,4 @@ public class App {
 
 
 
-    private static void getCriptoHistory() {
-        CargaCrypto cargaCrypto = new CargaCrypto();
-
-        // Probar con Solana (puedes cambiar a otra moneda admitida por CoinGecko)
-        String coinId = "ethereum";  // CoinGecko ID, por ejemplo: "bitcoin", "ethereum", "solana"
-        
-        System.out.println("Iniciando carga de datos históricos para " + coinId + "...");
-
-        // Llamar al método que carga solo fechas faltantes
-        cargaCrypto.cargarDatos(coinId);
-
-        System.out.println("Carga finalizada.");
-    }
 }

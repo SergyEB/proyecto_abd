@@ -12,7 +12,7 @@ public class Escenario3 {
     public void ejecutarEscenario3() {
 
         double principal = 20000;
-        double annualRate = 0.24; // 24% anual
+        double annualRate = 0.24; 
         int years = 5;
 
         double interest = principal * annualRate * years;
@@ -22,12 +22,12 @@ public class Escenario3 {
         Date startDate = Date.valueOf(LocalDate.of(LocalDate.now().getYear(), 2, 1)); 
 
         Debt debt = new Debt(
-                0, // Hay que cambiar el ID
+                0, 
                 totalDebt,
                 totalDebt,
                 annualRate,
                 startDate,
-                "Simple interest debt at 24% annually for 5 years",
+                "Deuda con interés simple al 24 % anual durante 5 años.",
                 4,  
                 19   
         );
@@ -36,13 +36,13 @@ public class Escenario3 {
         int generatedDebtId = debtDAO.insertDebt(debt);
         debt.setDebtId(generatedDebtId);
 
-        System.out.println("✅ Debt successfully inserted.");
+        System.out.println("Deuda creada satisfactoriamente");
 
         int months = 60;
         double monthlyPayment = totalDebt / months;
 
-        insertMonthlyPayment(transactionDAO, debt, monthlyPayment, "Loan payment March", "2025-03-01", 19, 3);
-        insertMonthlyPayment(transactionDAO, debt, monthlyPayment, "Loan payment April", "2025-04-01", 19, 3);
+        insertMonthlyPayment(transactionDAO, debt, monthlyPayment, "Pago de deuda de marzo", "2025-03-01", 19, 3);
+        insertMonthlyPayment(transactionDAO, debt, monthlyPayment, "Pago de deuda de abril", "2025-04-01", 19, 3);
     }
 
     private static void insertMonthlyPayment(TransactionDAO dao, Debt debt, double amount, String description,
@@ -60,8 +60,8 @@ public class Escenario3 {
         dao.insertTransaction(payment);
 
         double newBalance = debt.getPendingBalance() - amount;
-        System.out.println("New pending balance: " + newBalance);
-        System.out.println("Debt " + debt.getDebtId() + " updated with new pending balance: " + newBalance);
+        System.out.println("Saldo pendiente: " + newBalance);
+        System.out.println("La deuda " + debt.getDebtId() + " se actualizó con el saldo pendiente: " + newBalance);
 
         debt.setPendingBalance(newBalance);
         DebtDAO debtDAO = new DebtDAO();

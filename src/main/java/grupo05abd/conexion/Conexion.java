@@ -9,8 +9,8 @@ import javax.swing.JOptionPane;
 public class Conexion {
     static Connection connection = null;
     
-    static String user = "sa";
-    static String pass = "12345";
+    static String user = "NicoleUser";
+    static String pass = "1234";
     static String db = "Grupo5_IF51002025";
     static String ip = "localhost";
     static String port = "1433";
